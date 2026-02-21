@@ -31,7 +31,7 @@
 <script>
     // UPDATED MODEL NAME FOR 2026
     const API_KEY = 'AIzaSyCWuP7YKNf0XvKYDs4JkJxnnOss3wmNIsg';
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent?key=${API_KEY}`;
+    const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY;
 
     async function sendMessage() {
         const inputField = document.getElementById('user-input');
@@ -75,4 +75,5 @@
 </script>
 
 </body>
+
 </html>
