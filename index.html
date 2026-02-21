@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #chat-window { width: 100%; max-width: 500px; height: 85vh; background: white; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
+        #header { padding: 20px; background: #2c3e50; color: white; font-weight: bold; text-align: center; font-size: 1.2rem; }
+        #messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #ffffff; }
+        .msg { padding: 12px 16px; border-radius: 15px; max-width: 85%; font-size: 0.95rem; line-height: 1.5; word-wrap: break-word; }
+        .user { align-self: flex-end; background-color: #0078ff; color: white; border-bottom-right-radius: 2px; }
+        .ai { align-self: flex-start; background-color: #f1f0f0; color: #222; border-bottom-left-radius: 2px; white-space: pre-wrap; }
+        #input-area { padding: 20px; border-top: 1px solid #eee; display: flex; gap: 10px; background: #fafafa; }
+        input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; outline: none; padding-left: 20px; }
+        button { background: #0078ff; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="chat-window">
+    <div id="header">Personal AI Assistant</div>
+    <div id="messages"><div class="msg ai">I am now running on Gemini 3. How can I help?</div></div>
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="Ask me anything...">
+        <button onclick="sendMessage()">➔</button>
+    </div>
+</div>
+
+<script>
+    // UPDATED MODEL NAME FOR 2026
+    const API_KEY = 'AIzaSyCWuP7YKNf0XvKYDs4JkJxnnOss3wmNIsg';
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent?key=${API_KEY}`;
+
+    async function sendMessage() {
+        const inputField = document.getElementById('user-input');
+        const text = inputField.value.trim();
+        if (!text) return;
+
+        addMessage(text, 'user');
+        inputField.value = '';
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: text }] }] })
+            });
+
+            const data = await response.json();
+            
+            if (data.error) {
+                addMessage("Brain Error: " + data.error.message, 'ai');
+                return;
+            }
+
+            const aiText = data.candidates[0].content.parts[0].text;
+            addMessage(aiText, 'ai');
+        } catch (e) {
+            addMessage("Connection failed. Please ensure you are viewing this on your Netlify link, not as a local file.", 'ai');
+        }
+    }
+
+    function addMessage(text, type) {
+        const div = document.createElement('div');
+        div.classList.add('msg', type);
+        div.innerText = text;
+        document.getElementById('messages').appendChild(div);
+        const m = document.getElementById('messages');
+        m.scrollTop = m.scrollHeight;
+    }
+
+    document.getElementById('user-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+</script>
+
+</body>
+</html>
